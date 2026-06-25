@@ -4,6 +4,7 @@ import { Coins } from '@phosphor-icons/react';
 import { useStore } from '@/src/lib/store';
 import { formatEur, memberIncome, type Member } from '@/src/lib/iseeu';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { MoneyInput, InfoTip, AnimatedNumber } from '@/src/components/shared';
 
 const fields: {
@@ -46,6 +47,18 @@ export function IncomeStep() {
 				</p>
 			</div>
 
+			<Alert className="border-sky-500/25 bg-sky-500/5">
+				<AlertTitle className="text-sky-700 dark:text-sky-400">
+					Aylık değil, yıllık tutar girin
+				</AlertTitle>
+				<AlertDescription className="text-sky-700/80 dark:text-sky-300/80">
+					Tüm tutarlar bir yılın (12 ay) toplamı olmalıdır. Örneğin
+					aylık maaşı{' '}
+					<span className="font-medium">12 ile çarpıp</span> yıllık
+					brüt tutarı yazın.
+				</AlertDescription>
+			</Alert>
+
 			<div className="space-y-4">
 				{state.members.map((m) => {
 					const inc = memberIncome(m, state.exchangeRate);
@@ -78,11 +91,15 @@ export function IncomeStep() {
 											className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground"
 										>
 											{f.label}
+											<span className="font-normal text-muted-foreground/60">
+												· yıllık
+											</span>
 											{f.tip && <InfoTip text={f.tip} />}
 										</Label>
 										<MoneyInput
 											id={`${m.id}-${f.key}`}
 											currency={state.currency}
+											placeholder="Yıllık tutar"
 											value={m[f.key]}
 											onChange={(n) =>
 												dispatch({
@@ -108,7 +125,7 @@ export function IncomeStep() {
 				})}
 			</div>
 
-			<div className="flex items-center justify-between rounded-xl bg-primary/[0.05] p-4 ring-1 ring-primary/10">
+			<div className="flex items-center justify-between rounded-xl bg-primary/5 p-4 ring-1 ring-primary/10">
 				<span className="text-sm font-medium">
 					Toplam ISR (gelir göstergesi)
 				</span>
