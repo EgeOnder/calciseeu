@@ -3,9 +3,9 @@ import { Calculator, Bank, Scales } from '@phosphor-icons/react';
 
 import { useStore } from '@/src/lib/store';
 import { DEFAULT_TRY_RATE } from '@/src/lib/iseeu';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { MoneyInput, InfoTip, LegalNotice } from '@/src/components/shared';
+import { Label } from '../components/ui/label';
+import { Input } from '../components/ui/input';
+import { MoneyInput, InfoTip } from '@/src/components/shared';
 
 const features = [
 	{
@@ -29,24 +29,14 @@ export function WelcomeStep() {
 	const { state, dispatch } = useStore();
 	return (
 		<div className="space-y-6">
-			<LegalNotice title="Bu bir resmî hesaplama değildir">
-				Bu araç yalnızca <span className="font-medium">tahmini</span>{' '}
-				bir sonuç üretir ve resmî CAF hesaplamasının yerine geçmez.
-				ISEEU Parificato için son ve geçerli sonucu üniversitenin onaylı
-				CAF merkezi hesaplar; Polimi bu verileri yalnızca onaylı
-				CAF&apos;tan elektronik olarak alır.
-			</LegalNotice>
 			<div className="space-y-2">
 				<h1 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-					ISEEU hesaplama: ISEE Parificato sonucunu tahmin edin
+					Manuel hesaplama
 				</h1>
 				<p className="text-muted-foreground">
-					Bu araç, İtalya&apos;da okuyan Türk öğrencilerin PoliMi DSU,
-					üniversite bursu ve yurt başvurularında kullanılan{' '}
-					<span className="font-medium text-foreground">
-						ISEEU Parificato
-					</span>{' '}
-					değerini tahmin etmesine yardımcı olur.
+					Manuel olarak ISEEU Parificato tahmini yapmak için önce para
+					birimi ve döviz kurunu ayarlayın. Ardından gelir ve varlık
+					bilgilerini girerek tahmini sonucu anında görün.
 				</p>
 			</div>
 

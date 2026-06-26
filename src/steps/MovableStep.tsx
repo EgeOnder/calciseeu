@@ -2,7 +2,7 @@ import { ChartLineUp, Vault } from '@phosphor-icons/react';
 
 import { useStore } from '@/src/lib/store';
 import { formatEur } from '@/src/lib/iseeu';
-import { Label } from '@/components/ui/label';
+import { Label } from '../components/ui/label';
 import { MoneyInput, InfoTip, AnimatedNumber } from '@/src/components/shared';
 
 export function MovableStep() {
@@ -34,7 +34,7 @@ export function MovableStep() {
 							className="size-4.5 text-foreground/70"
 						/>
 						Banka & posta hesapları
-						<InfoTip text="Genel ISEE kuralında 31 Aralık bakiyesi ile yıllık ortalama bakiyeden YÜKSEK olanı dikkate alınabilir. Ortak hesaplarda yalnızca kişinin payını ekleyin." />
+						<InfoTip text="Yalnızca 31.12.2024 tarihindeki bakiyeyi girin. Ortak hesaplarda yalnızca kişinin payını ekleyin." />
 					</Label>
 					<MoneyInput
 						id="bank"

@@ -1,16 +1,29 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner';
 import {
 	Sparkle,
 	ArrowCounterClockwise,
 	ShareNetwork,
 	DownloadSimple,
 	CircleNotch,
+	Check,
+	FloppyDisk,
+	GoogleLogo,
 } from '@phosphor-icons/react';
 
+import { useRouter } from 'next/navigation';
+
 import { useStore } from '@/src/lib/store';
+import { authClient } from '@/src/lib/auth-client';
+import { useAppSession } from '@/src/lib/session';
+import {
+	upsertCalculationLocal,
+	useActiveCalculationId,
+	useCalculations,
+} from '@/src/lib/calculations';
 import { formatEur, formatNumber, type IseeuResult } from '@/src/lib/iseeu';
-import { Button } from '@/components/ui/button';
+import { Button } from '../components/ui/button';
 import {
 	Dialog,
 	DialogContent,
@@ -18,12 +31,11 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from '@/components/ui/dialog';
+} from '../components/ui/dialog';
 import { AnimatedNumber, LegalNotice } from '@/src/components/shared';
 import {
 	renderShareCard,
 	canShareImageFiles,
-	shareImageFile,
 	downloadImage,
 } from '@/src/lib/shareImage';
 
@@ -145,8 +157,13 @@ function ShareResult({ result }: { result: IseeuResult }) {
 
 	const handleShare = async () => {
 		if (!blob) return;
-		const shared = await shareImageFile(blob);
-		if (!shared) downloadImage(blob);
+
+		downloadImage(blob);
+	};
+
+	const handleDownload = () => {
+		if (!blob) return;
+		downloadImage(blob);
 	};
 
 	return (
@@ -186,10 +203,131 @@ function ShareResult({ result }: { result: IseeuResult }) {
 						)}
 						<Button
 							variant={shareSupported ? 'outline' : 'default'}
-							onClick={() => blob && downloadImage(blob)}
+							onClick={handleDownload}
 							disabled={!blob}
 						>
 							<DownloadSimple /> Görseli indir
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</>
+	);
+}
+
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+function SaveResult() {
+	const { state, config, result } = useStore();
+	const { session, isPending } = useAppSession();
+	const router = useRouter();
+	const activeId = useActiveCalculationId();
+	const calculations = useCalculations();
+	const [status, setStatus] = useState<SaveStatus>('idle');
+	const [promptOpen, setPromptOpen] = useState(false);
+
+	// Already-persisted when viewing a saved calculation, or right after saving.
+	const isSaved =
+		status === 'saved' ||
+		(activeId != null && calculations.some((calc) => calc.id === activeId));
+
+	const save = async () => {
+		setStatus('saving');
+		const title = `ISEEU ${formatEur(result.iseeu, true)}`;
+		const response = await fetch('/api/calculations', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				type: 'manual',
+				title,
+				iseeu: result.iseeu,
+				data: { state, config },
+			}),
+		}).catch(() => null);
+
+		if (!response || !response.ok) {
+			setStatus('error');
+			toast.error('Sonuç kaydedilemedi', {
+				description: 'Lütfen tekrar deneyin.',
+			});
+			return;
+		}
+
+		const { id } = (await response.json()) as { id: string };
+		setStatus('saved');
+		upsertCalculationLocal({
+			id,
+			type: 'manual',
+			title,
+			iseeu: result.iseeu,
+			createdAt: new Date().toISOString(),
+		});
+		// Reflect the saved calculation in the URL so a reload keeps it open
+		// (and the sidebar can mark it active).
+		router.replace(`/manual?id=${encodeURIComponent(id)}`);
+		toast.success('Sonuç kaydedildi', {
+			description: 'Hesaplamayı kenar çubuğundan tekrar açabilirsiniz.',
+		});
+	};
+
+	const handleClick = () => {
+		if (status === 'saving' || isSaved) return;
+		if (!session) {
+			setPromptOpen(true);
+			return;
+		}
+		void save();
+	};
+
+	return (
+		<>
+			<Button
+				className="w-full"
+				onClick={handleClick}
+				disabled={isPending || status === 'saving' || isSaved}
+			>
+				{status === 'saving' ? (
+					<>
+						<CircleNotch className="animate-spin" /> Kaydediliyor
+					</>
+				) : isSaved ? (
+					<>
+						<Check weight="bold" /> Kaydedildi
+					</>
+				) : (
+					<>
+						<FloppyDisk /> Sonucu kaydet
+					</>
+				)}
+			</Button>
+			{status === 'error' && (
+				<p className="text-center text-xs text-destructive">
+					Sonuç kaydedilemedi. Lütfen tekrar deneyin.
+				</p>
+			)}
+
+			<Dialog open={promptOpen} onOpenChange={setPromptOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>
+							Sonucu kaydetmek için giriş yapın
+						</DialogTitle>
+						<DialogDescription>
+							Hesaplamanızı hesabınıza kaydedip daha sonra kenar
+							çubuğundan tekrar açabilmek için giriş yapmanız
+							gerekir.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button
+							className="w-full"
+							onClick={() => {
+								void authClient.signIn.social({
+									provider: 'google',
+								});
+							}}
+						>
+							<GoogleLogo weight="bold" /> Google ile giriş yap
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -278,11 +416,20 @@ export function ResultStep() {
 				/>
 			</motion.div>
 
-			<div className="grid gap-2 sm:grid-cols-2">
-				<ShareResult result={result} />
-				<Button variant="ghost" className="w-full" onClick={reset}>
-					<ArrowCounterClockwise /> Baştan başla
-				</Button>
+			<div className="space-y-2">
+				<SaveResult />
+				<div className="grid gap-2 sm:grid-cols-2">
+					<ShareResult result={result} />
+					<Button
+						variant="ghost"
+						className="w-full"
+						onClick={() => {
+							reset();
+						}}
+					>
+						<ArrowCounterClockwise /> Baştan başla
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

@@ -7,10 +7,10 @@ import {
 	formatNumber,
 	type MemberRole,
 } from '@/src/lib/iseeu';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { InfoTip } from '@/src/components/shared';
 
 const roleLabels: Record<MemberRole, string> = {

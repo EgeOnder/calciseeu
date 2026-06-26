@@ -8,9 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.next
+next-env.d.ts
 dist
 dist-ssr
 *.local
+tmp
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +28,6 @@ dist-ssr
 
 # Harness folders
 .claude
+
+# Environment variables
+.env

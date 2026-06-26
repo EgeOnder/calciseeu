@@ -28,7 +28,7 @@ Run all checks locally — CI runs the same steps:
 
 ```bash
 bun run lint     # oxlint
-bun run build    # tsc -b + vite build (catches type errors)
+bun run build    # next build (catches type errors)
 ```
 
 Please make sure:

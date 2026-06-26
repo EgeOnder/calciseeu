@@ -3,17 +3,9 @@ import { animate, motion, useMotionValue, useTransform } from 'motion/react';
 import { Info } from '@phosphor-icons/react';
 
 import { cn } from '@/lib/utils';
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupInput,
-} from '@/components/ui/input-group';
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 export function AnimatedNumber({
 	value,

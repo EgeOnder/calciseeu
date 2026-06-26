@@ -3,11 +3,11 @@ import { House, Plus, Trash, MapTrifold } from '@phosphor-icons/react';
 
 import { useStore, makeProperty } from '@/src/lib/store';
 import { formatEur, propertyIspEur, type Property } from '@/src/lib/iseeu';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '../components/ui/label';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { Switch } from '../components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import {
 	MoneyInput,
 	PlainNumberInput,
@@ -84,7 +84,7 @@ function PropertyCard({ p, index }: { p: Property; index: number }) {
 			</RadioGroup>
 
 			{/* Valuation */}
-			{p.kind === 'building' && !p.useManualValue ? (
+			{p.kind === 'building' ? (
 				<div className="space-y-1.5">
 					<Label className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
 						Bina yüzölçümü (m²)
@@ -111,17 +111,6 @@ function PropertyCard({ p, index }: { p: Property; index: number }) {
 						onChange={(n) => update({ manualValue: n })}
 					/>
 				</div>
-			)}
-
-			{p.kind === 'building' && (
-				<label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
-					<Switch
-						checked={p.useManualValue}
-						onCheckedChange={(c) => update({ useManualValue: c })}
-						size="sm"
-					/>
-					m² yerine değeri elle gireceğim
-				</label>
 			)}
 
 			<div className="space-y-1.5">
@@ -174,10 +163,9 @@ export function ImmovableStep() {
 			</div>
 
 			<LegalNotice title="Dikkat">
-				Arsa alanını binanın m²&apos;si sanmak veya yalnızca yerel vergi
-				değerini kullanıp CAF&apos;ın 500 €/m² değerleme ihtimalini göz
-				ardı etmek sık yapılan hatalardır. Nihai değerleme CAF&apos;a
-				bağlıdır.
+				Bina ve ana konut için rayiç bedel kullanılmaz; yalnızca binanın
+				veya bağımsız bölümün m²&apos;si girilir. Arsa alanını bina m²&apos;siyle
+				karıştırmayın.
 			</LegalNotice>
 
 			<div className="space-y-3">

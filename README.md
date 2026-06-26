@@ -4,10 +4,10 @@
 
 # ISEEU Hesaplama
 
-Polimi DSU ve üniversite bursları için adım adım, **tahmini** ISEEU Parificato hesaplayıcısı.
+Polimi DSU ve üniversite bursları için manuel veya belge destekli, **tahmini** ISEEU Parificato hesaplayıcısı.
 <br />
 <br />
-A step-by-step **estimate** calculator for the ISEEU Parificato indicator used by Polimi DSU and university scholarships.
+A manual or document-assisted **estimate** calculator for the ISEEU Parificato indicator used by Polimi DSU and university scholarships.
 
 <p align="center">
   <a href="https://github.com/EgeOnder/calciseeu/actions/workflows/ci.yml"><img src="https://github.com/EgeOnder/calciseeu/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
@@ -24,16 +24,19 @@ A step-by-step **estimate** calculator for the ISEEU Parificato indicator used b
 Requires [Bun](https://bun.sh).
 
 ```bash
-bun install      # install dependencies
-bun run dev      # start the dev server (http://localhost:5173)
+bun install
+cp .env.example .env   # add database, auth, R2, and OpenAI credentials
+bun run db:migrate
+bun run dev            # http://localhost:3000
 ```
 
-| Script            | Description                          |
-| ----------------- | ------------------------------------ |
-| `bun run dev`     | Start the Vite dev server            |
-| `bun run build`   | Type-check (`tsc -b`) and build      |
-| `bun run preview` | Preview the production build locally |
-| `bun run lint`    | Lint with oxlint                     |
+| Script               | Description                         |
+| -------------------- | ----------------------------------- |
+| `bun run dev`        | Start the Next.js dev server        |
+| `bun run build`      | Type-check and build with Next.js   |
+| `bun run start`      | Start the production Next.js server |
+| `bun run lint`       | Lint with oxlint                    |
+| `bun run db:migrate` | Apply database migrations           |
 
 ## How the estimate works
 

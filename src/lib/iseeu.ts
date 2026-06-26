@@ -50,9 +50,9 @@ export interface Property {
 	kind: PropertyKind;
 	/** m² for a building (valued at 500 €/m²). */
 	areaSqm: number;
-	/** Whether the user enters the value directly instead of m² (local currency). */
+	/** Legacy persisted flag. Ignored for buildings; buildings always use m². */
 	useManualValue: boolean;
-	manualValue: number; // total value in local currency
+	manualValue: number; // land value in local currency
 	/** Ownership share, percentage (0-100). */
 	ownershipPct: number;
 	/** Does the household live in this property (main residence)? */
@@ -65,7 +65,7 @@ export interface HouseholdState {
 	studentIndependent: boolean;
 	parentStatus: 'married' | 'divorced' | 'unmarried';
 	members: Member[];
-	movableBank: number; // bank/post: higher of Dec 31 or average balance (local currency)
+	movableBank: number; // bank/post balance at 31.12.2024 (local currency)
 	movableInvestments: number; // funds/stocks/bonds/insurance/company shares (local currency)
 	properties: Property[];
 }
@@ -158,20 +158,12 @@ export function memberIncome(m: Member, rate: number): MemberIncome {
 
 /** Value contributed to ISP by a single property (in EUR). */
 export function propertyIspEur(p: Property, rate: number): number {
-	// Raw value (local) → EUR
-	const rawLocal = p.useManualValue
-		? p.manualValue
-		: p.kind === 'building'
-			? p.areaSqm * BUILDING_EUR_PER_SQM * rate // m²×500€ value to local; converted back below
-			: p.manualValue; // no m² convention for land → manual value expected
-
-	// For the building + m² option the value is already EUR-based, so handle it specially:
-	let valueEur: number;
-	if (!p.useManualValue && p.kind === 'building') {
-		valueEur = p.areaSqm * BUILDING_EUR_PER_SQM;
-	} else {
-		valueEur = toEur(rawLocal, rate);
-	}
+	// Foreign buildings, including the main residence, are always valued from
+	// their floor area. Rayiç/assessed/market value is not an input.
+	const valueEur =
+		p.kind === 'building'
+			? p.areaSqm * BUILDING_EUR_PER_SQM
+			: toEur(p.manualValue, rate);
 
 	// Ownership share
 	const net = valueEur * (Math.min(100, Math.max(0, p.ownershipPct)) / 100);

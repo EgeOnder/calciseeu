@@ -3,8 +3,8 @@ import { Coins } from '@phosphor-icons/react';
 
 import { useStore } from '@/src/lib/store';
 import { formatEur, memberIncome, type Member } from '@/src/lib/iseeu';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Label } from '../components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { MoneyInput, InfoTip, AnimatedNumber } from '@/src/components/shared';
 
 const fields: {
@@ -99,7 +99,7 @@ export function IncomeStep() {
 										<MoneyInput
 											id={`${m.id}-${f.key}`}
 											currency={state.currency}
-											placeholder="Yıllık tutar"
+											placeholder="0"
 											value={m[f.key]}
 											onChange={(n) =>
 												dispatch({
